@@ -5,7 +5,7 @@ import numpy as np
 
 def output_keypoints(frame, proto_file, weights_file, threshold, model_name, BODY_PARTS):
     global points
-    global count
+    global count,frame_width
     # 이미지 읽어오기
     # frame = cv2.imread(image_path)
     # cv2.im
@@ -62,15 +62,13 @@ def output_keypoints(frame, proto_file, weights_file, threshold, model_name, BOD
                     count[0] = count[0] + 1
 
             points.append((x, y))
-            # print(f"[pointed] {BODY_PARTS[i]} ({i}) => prob: {prob:.5f} / x: {x} / y: {y}")
+
 
         else:  # [not pointed]
-            # if i in (0, 2, 5, 17, 18):
-            #     cv2.circle(frame, (x, y), 5, (0, 255, 255), thickness=-1, lineType=cv2.FILLED)
-            #     cv2.putText(frame, str(i), (x, y), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0, 0), 1, lineType=cv2.LINE_AA)
+
 
             points.append(None)
-            # print(f"[not pointed] {BODY_PARTS[i]} ({i}) => prob: {prob:.5f} / x: {x} / y: {y}")
+
 
     return frame
 
@@ -82,56 +80,52 @@ def output_keypoints_with_lines(POSE_PAIRS, frame):
     # Neck 과 MidHeap 의 좌표값이 존재한다면
     if count[0] > count[1]:
         print("left")
-        # calculate_degree(point_1=points[5], point_2=points[18], point_3=points[5], point_4=points[0], frame=frame_line)
+
         calculate_degree(point_1=points[5], point_2=points[18], frame=frame_line)
     elif count[0] < count[1]:
         print("right")
-        # calculate_degree(point_1=points[2], point_2=points[17], point_3=points[2], point_4=points[0], frame=frame_line)
+
         calculate_degree(point_1=points[2], point_2=points[17], frame=frame_line)
-    # if (points[5] is not None) and (points[18] is not None) and (points[2] is not None):
+
 
     for pair in POSE_PAIRS:
         part_a = pair[0]  # 0 (Head)
         part_b = pair[1]  # 1 (Neck)
         if points[part_a] and points[part_b]:
             print(f"[linked] {part_a} {points[part_a]} <=> {part_b} {points[part_b]}")
-            # Neck 과 MidHip 이라면 분홍색 선
-            # if (part_a == 5 and part_b == 18) or (part_a == 18 and part_b == 5) or (part_a == 1 and part_b == 8):
-            #     cv2.line(frame, points[part_a], points[part_b], (255, 0, 255), 3)
-            # else:  # 노란색 선
+
             cv2.line(frame, points[part_a], points[part_b], (0, 255, 0), 3)
         else:
             print(f"[not linked] {part_a} {points[part_a]} <=> {part_b} {points[part_b]}")
 
     # 포인팅 되어있는 프레임과 라인까지 연결된 프레임을 가로로 연결
-    frame_horizontal = cv2.hconcat([frame, frame_line])
-    return frame_horizontal
+
+    return frame
 
 
 def calculate_degree(point_1, point_2, frame):
     # 역탄젠트 구하기
     dx1 = abs(point_2[0] - point_1[0])
     dy1 = abs(point_2[1] - point_1[1])
-    # dx2 = abs(point_4[0] - point_3[0])
-    # dy2 = abs(point_4[1] - point_3[1])
+
     rad1 = math.atan2(abs(dy1), abs(dx1))
-    # rad2 = math.atan2(abs(dy2), abs(dx2))
+
 
     # radian 을 degree 로 변환
     deg1 = rad1 * 180 / math.pi
-    # deg2 = rad2 * 180 / math.pi
 
-    # if point_1[1]>
-    deg = deg1 # - deg2
-    # degree 가 30'보다 작으면 거북목이라 판단
-    if deg > 75:
-        string = f"not {deg: .0f}"#, {deg1: .0f}, {deg2: .0f}"
-        cv2.putText(frame, string, (0, 25), cv2.FONT_HERSHEY_DUPLEX, 1, (255, 0, 255))
-        print(f"[degree] {deg} ({string})")
+    deg = deg1  # - deg2
+    # degree 가 80'보다 크면 좋음 80~70' 주의 70'보다 작으면 거북목
+    if deg > 80:
+        text = "good"
+    elif deg > 70:
+        text = "careful"
     else:
-        string = f"turtle {deg: .0f}"#, {deg1: .0f}, {deg2: .0f}"
-        cv2.putText(frame, string, (0, 25), cv2.FONT_HERSHEY_DUPLEX, 1, (255, 0, 255))
-        print(f"[degree] {deg} ({string})")
+        text = "turtle neck"
+
+    string = f"{text} {deg: .0f}"  # , {deg1: .0f}, {deg2: .0f}"
+    cv2.putText(frame, string, (0, 25), cv2.FONT_HERSHEY_DUPLEX, 1 if frame_width > 250 else frame_width / 250,
+                (255, 0, 255))
 
 
 BODY_PARTS_BODY_25 = {0: "Nose", 1: "Neck", 2: "RShoulder", 3: "RElbow", 4: "RWrist",

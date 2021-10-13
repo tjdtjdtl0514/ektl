@@ -53,16 +53,12 @@ class Pose(models.Model):
         # np array 변환
         cv_img = np.array(pil_img)
         cv_img = rgba2rgb(cv_img)
-        # print(cv_img.shape)
 
-        # cv_img = cv_img.reshape(-1, -1, -1)
         # 모델 위치
-        # protoFile_body_25 = os.path.join(BASE_DIR, "model/pose_deploy.prototxt")
-        # weightsFile_body_25 = os.path.join(BASE_DIR, "model/pose_iter_584000.caffemodel")
-        protoFile_body_25 = "C:/Users/ohjoonhoo/Downloads/turtleneck/model/pose_deploy.prototxt"
-        weightsFile_body_25 = "C:/Users/ohjoonhoo/Downloads/turtleneck/model/pose_iter_584000.caffemodel"
-        # protoFile_body_25 = join(dirname(__file__), "model/pose_deploy.prototxt")
-        # weightsFile_body_25 = join(dirname(__file__), "model/pose_iter_584000.caffemodel")
+
+        protoFile_body_25 = "C:/Users/kim sung hoon/Desktop/ektl/model/pose_deploy.prototxt"
+        weightsFile_body_25 = "C:/Users/kim sung hoon/Desktop/ektl/model/pose_iter_584000.caffemodel"
+
 
         BODY_PARTS_BODY_25 = {0: "Nose", 1: "Neck", 2: "RShoulder", 3: "RElbow", 4: "RWrist",
                               5: "LShoulder", 6: "LElbow", 7: "LWrist", 8: "MidHip", 9: "RHip",
