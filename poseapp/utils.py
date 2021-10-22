@@ -6,9 +6,7 @@ import numpy as np
 def output_keypoints(frame, proto_file, weights_file, threshold, model_name, BODY_PARTS):
     global points
     global count,frame_width
-    # 이미지 읽어오기
-    # frame = cv2.imread(image_path)
-    # cv2.im
+
 
     # 네트워크 불러오기
     net = cv2.dnn.readNetFromCaffe(proto_file, weights_file)
@@ -64,7 +62,7 @@ def output_keypoints(frame, proto_file, weights_file, threshold, model_name, BOD
             points.append((x, y))
 
 
-        else:  # [not pointed]
+        else:
 
 
             points.append(None)
